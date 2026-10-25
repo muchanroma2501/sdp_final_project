@@ -134,3 +134,109 @@ src/main/resources/static
 └── index.html
 docs                    # Audit, UML, assignment report draft, defense notes
 ```
+
+## Assignment #5 — Strategy Pattern
+
+This assignment adds the Strategy behavioral pattern to the existing PC Build Studio application. The project already has three named build algorithms: gaming, budget, and workstation. Instead of a single conditional block selecting the correct factory, the build algorithm is now represented as a strategy object and executed through a small context.
+
+### Strategy structure
+
+- `com.aitu.sdp.assignment5.strategy.ComputerBuildStrategy` — common strategy interface
+- `com.aitu.sdp.assignment5.strategy.GamingBuildStrategy` — gaming build algorithm
+- `com.aitu.sdp.assignment5.strategy.BudgetBuildStrategy` — budget build algorithm
+- `com.aitu.sdp.assignment5.strategy.WorkstationBuildStrategy` — workstation build algorithm
+- `com.aitu.sdp.assignment5.strategy.BuildStrategyContext` — holds the current strategy and delegates execution
+- `com.aitu.sdp.assignment4.facade.PCConfiguratorFacade` — client that selects the strategy and validates the request
+
+The Strategy pattern complements the existing Factory Method and Builder patterns instead of replacing them. The strategy chooses the correct order factory and Builder pipeline for the selected build type, while the Factory Method and Builder remain responsible for the actual assembly flow.
+
+### Runtime strategy switching
+
+The same context can change strategies at runtime:
+
+```java
+BuildStrategyContext context = new BuildStrategyContext();
+context.setStrategy(new GamingBuildStrategy());
+Computer gaming = context.build(factory, gamingRequest);
+
+context.setStrategy(new BudgetBuildStrategy());
+Computer budget = context.build(factory, budgetRequest);
+
+context.setStrategy(new WorkstationBuildStrategy());
+Computer workstation = context.build(factory, workstationRequest);
+```
+
+### Example named-build requests
+
+Gaming:
+
+```json
+{
+  "ecosystem": "intel_nvidia",
+  "buildType": "gaming",
+  "ram": "32GB DDR5",
+  "storage": "1TB NVMe SSD",
+  "coolingSystem": "280mm AIO Liquid Cooling",
+  "hasRGB": true
+}
+```
+
+Budget:
+
+```json
+{
+  "ecosystem": "intel_nvidia",
+  "buildType": "budget",
+  "ram": "16GB DDR4",
+  "storage": "512GB NVMe SSD",
+  "coolingSystem": "Air Cooler",
+  "hasRGB": false
+}
+```
+
+Workstation:
+
+```json
+{
+  "ecosystem": "intel_nvidia",
+  "buildType": "workstation",
+  "ram": "64GB DDR5",
+  "storage": "2TB NVMe SSD",
+  "coolingSystem": "360mm AIO Liquid Cooling",
+  "hasRGB": true
+}
+```
+
+### Running the application
+
+```powershell
+./mvnw.cmd spring-boot:run
+```
+
+```bash
+./mvnw spring-boot:run
+```
+
+Then open <http://localhost:8080>.
+
+### Running the tests
+
+```powershell
+./mvnw.cmd test
+```
+
+```bash
+./mvnw test
+```
+
+### How the Strategy pattern fits the project
+
+The application still uses:
+
+- Abstract Factory: `ComponentFactory` and the platform-specific factories
+- Factory Method: named order factories such as `GamingPCOrderFactory`, `BudgetPCOrderFactory`, and `WorkstationPCOrderFactory`
+- Builder: `ComputerBuilder` implementations create the immutable `Computer`
+- Facade: `PCConfiguratorFacade` coordinates validation, diagnostics, and response assembly
+- Strategy: chooses the named build algorithm dynamically without changing the context logic
+
+This makes the code more flexible, easier to extend, and better suited for defense explanations.

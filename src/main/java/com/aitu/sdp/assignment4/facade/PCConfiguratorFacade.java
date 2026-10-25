@@ -1,15 +1,11 @@
 package com.aitu.sdp.assignment4.facade;
 
-import com.aitu.sdp.assignment2.BudgetPCOrderFactory;
 import com.aitu.sdp.assignment2.ComponentCatalog;
 import com.aitu.sdp.assignment2.ComponentFactory;
 import com.aitu.sdp.assignment2.Computer;
 import com.aitu.sdp.assignment2.ComputerBuilder;
-import com.aitu.sdp.assignment2.ComputerOrderFactory;
 import com.aitu.sdp.assignment2.GamingComputerBuilder;
-import com.aitu.sdp.assignment2.GamingPCOrderFactory;
 import com.aitu.sdp.assignment2.PowerRequirementCalculator;
-import com.aitu.sdp.assignment2.WorkstationPCOrderFactory;
 import com.aitu.sdp.assignment2.controller.BuildPCRequest;
 import com.aitu.sdp.assignment2.controller.CustomPCRequest;
 import com.aitu.sdp.assignment2.controller.PCResponse;
@@ -17,32 +13,58 @@ import com.aitu.sdp.assignment4.diagnostics.BuildDiagnostics;
 import com.aitu.sdp.assignment4.diagnostics.BuildDiagnosticsService;
 import com.aitu.sdp.assignment4.diagnostics.DiagnosticStatus;
 import com.aitu.sdp.assignment4.support.ComponentFactoryProvider;
+import com.aitu.sdp.assignment5.strategy.BuildStrategyContext;
+import com.aitu.sdp.assignment5.strategy.ComputerBuildStrategy;
+import com.aitu.sdp.assignment5.strategy.BudgetBuildStrategy;
+import com.aitu.sdp.assignment5.strategy.GamingBuildStrategy;
+import com.aitu.sdp.assignment5.strategy.WorkstationBuildStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class PCConfiguratorFacade {
     private final ComponentFactoryProvider factoryProvider;
     private final BuildDiagnosticsService diagnosticsService;
+    private final Map<String, ComputerBuildStrategy> strategyRegistry;
+
+    @Autowired
+    public PCConfiguratorFacade(ComponentFactoryProvider factoryProvider,
+                               BuildDiagnosticsService diagnosticsService,
+                               List<ComputerBuildStrategy> strategies) {
+        this.factoryProvider = factoryProvider;
+        this.diagnosticsService = diagnosticsService;
+        this.strategyRegistry = strategies.stream()
+                .collect(Collectors.toMap(
+                        strategy -> normalizeBuildType(strategy.getBuildType()),
+                        Function.identity(),
+                        (left, right) -> left,
+                        LinkedHashMap::new));
+    }
 
     public PCConfiguratorFacade(ComponentFactoryProvider factoryProvider,
                                BuildDiagnosticsService diagnosticsService) {
-        this.factoryProvider = factoryProvider;
-        this.diagnosticsService = diagnosticsService;
+        this(factoryProvider, diagnosticsService, List.of(
+                new GamingBuildStrategy(),
+                new BudgetBuildStrategy(),
+                new WorkstationBuildStrategy()));
     }
 
     public List<PCResponse> getPresets() {
         ComponentFactory factory = factoryProvider.factoryFor("intel_nvidia");
         return List.of(
                 response("Ultimate Gaming Beast",
-                        new GamingPCOrderFactory(factory).orderComputer(), "gaming", "intel_nvidia"),
+                        new com.aitu.sdp.assignment2.GamingPCOrderFactory(factory).orderComputer(), "gaming", "intel_nvidia"),
                 response("Budget Office PC",
-                        new BudgetPCOrderFactory(factory).orderComputer(), "budget", "intel_nvidia"),
+                        new com.aitu.sdp.assignment2.BudgetPCOrderFactory(factory).orderComputer(), "budget", "intel_nvidia"),
                 response("Creator Workstation",
-                        new WorkstationPCOrderFactory(factory).orderComputer(), "workstation", "intel_nvidia"));
+                        new com.aitu.sdp.assignment2.WorkstationPCOrderFactory(factory).orderComputer(), "workstation", "intel_nvidia"));
     }
 
     public Map<String, Object> getComponents(String ecosystem) {
@@ -100,24 +122,26 @@ public class PCConfiguratorFacade {
     public PCResponse buildNamed(BuildPCRequest request) {
         validateBuildRequest(request);
         ComponentFactory factory = factoryProvider.factoryFor(request.getEcosystem());
-        ComputerOrderFactory orderFactory = orderFactory(request.getBuildType(), factory);
-        Computer computer = orderFactory.orderComputer(
-                request.getRam().trim(), request.getStorage().trim(),
-                request.getCoolingSystem(), request.isHasRGB());
+
+        String normalizedKey = normalizeBuildType(request.getBuildType());
+        ComputerBuildStrategy strategy = strategyRegistry.get(normalizedKey);
+        if (strategy == null) {
+            throw new IllegalArgumentException("buildType must be gaming, budget, or workstation");
+        }
+
+        BuildStrategyContext context = new BuildStrategyContext();
+        context.setStrategy(strategy);
+        Computer computer = context.build(factory, request);
+
         BuildDiagnostics diagnostics = diagnosticsService.diagnose(toRequest(
                 request.getEcosystem(), computer));
         requireBuildAllowed(diagnostics);
-        return response(request.getBuildType() + " build", computer, request.getBuildType(),
+        return response(request.getBuildType().trim(), computer, strategy.getBuildType(),
                 request.getEcosystem(), diagnostics);
     }
 
-    private ComputerOrderFactory orderFactory(String type, ComponentFactory factory) {
-        return switch (type.trim().toLowerCase()) {
-            case "gaming" -> new GamingPCOrderFactory(factory);
-            case "budget" -> new BudgetPCOrderFactory(factory);
-            case "workstation" -> new WorkstationPCOrderFactory(factory);
-            default -> throw new IllegalArgumentException("buildType must be gaming, budget, or workstation");
-        };
+    private static String normalizeBuildType(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
     private void validateBuildRequest(BuildPCRequest request) {
@@ -161,7 +185,7 @@ public class PCConfiguratorFacade {
         int required = PowerRequirementCalculator.requiredWatts(
                 computer.getCpuComponent().getTdpWatts(), computer.getGpuComponent().getTdpWatts());
         String highlights = "Abstract Factory selected the " + ecosystem
-                + " component family. Factory Method executed the " + pipeline
+                + " component family. Strategy executed the " + pipeline
                 + " pipeline. Builder created an immutable Computer after validation.";
         String validationStatus = diagnostics.status() == DiagnosticStatus.REVIEW
                 ? "Valid - build allowed with recommendations."
