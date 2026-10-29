@@ -2,7 +2,7 @@
 
 PC Build Studio is a Java 17 and Spring Boot web application for selecting PC hardware, validating compatibility on the server, assembling builds, and exporting reports. The browser interface is Russian-language, responsive, and uses plain HTML, CSS, and JavaScript. Hardware models and metadata come from the existing in-memory component catalog; no database or frontend build pipeline is required.
 
-Repository: <https://github.com/muchanroma2501/SDPasik2>
+Repository: <https://github.com/muchanroma2501/SDPasik5>
 
 ## Requirements and commands
 

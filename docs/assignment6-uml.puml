@@ -1,0 +1,80 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+interface Element {
+  + accept(visitor: Visitor): void
+}
+
+interface Visitor {
+  + visitFile(file: FileElement): void
+  + visitDirectory(directory: DirectoryElement): void
+}
+
+class FileElement implements Element {
+  - name: String
+  - sizeBytes: long
+  + FileElement(name: String, sizeBytes: long)
+  + getName(): String
+  + getSizeBytes(): long
+  + accept(visitor: Visitor): void
+}
+
+class DirectoryElement implements Element {
+  - name: String
+  - children: List<Element>
+  + DirectoryElement(name: String, children: List<Element>)
+  + getName(): String
+  + getChildren(): List<Element>
+  + accept(visitor: Visitor): void
+}
+
+class SizeCalculatorVisitor implements Visitor {
+  - totalSizeBytes: long
+  + visitFile(file: FileElement): void
+  + visitDirectory(directory: DirectoryElement): void
+  + getTotalSizeBytes(): long
+}
+
+class SearchVisitor implements Visitor {
+  - query: String
+  - caseSensitive: boolean
+  - matches: List<String>
+  + SearchVisitor(query: String, caseSensitive: boolean)
+  + visitFile(file: FileElement): void
+  + visitDirectory(directory: DirectoryElement): void
+  + getMatches(): List<String>
+}
+
+class FileSystemDemoService {
+  + buildSampleTree(): DirectoryElement
+  + demoResults(): Map<String, Object>
+}
+
+class FileSystemDemoController {
+  + demo(): Map<String, Object>
+}
+
+FileElement ..> Visitor
+DirectoryElement ..> Visitor
+SizeCalculatorVisitor ..|> Visitor
+SearchVisitor ..|> Visitor
+
+DirectoryElement o-- "*" Element
+FileSystemDemoController --> FileSystemDemoService
+FileSystemDemoService --> DirectoryElement
+FileSystemDemoService --> SizeCalculatorVisitor
+FileSystemDemoService --> SearchVisitor
+
+note right of FileElement
+  file.accept(visitor)
+  => visitor.visitFile(this)
+end note
+
+note right of DirectoryElement
+  directory.accept(visitor)
+  => visitor.visitDirectory(this)
+end note
+
+@enduml
+
