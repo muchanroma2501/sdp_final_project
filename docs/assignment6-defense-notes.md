@@ -2,7 +2,7 @@
 
 ## 1. 3–5 minute demo plan
 
-1. Open `src/main/java/com/aitu/sdp/assignment6/visitor` in IntelliJ.
+1. Open `src/main/java/com/aitu/sdp/visitor` in IntelliJ.
 2. Show `Element` and `Visitor` interfaces.
 3. Show `FileElement.accept()` and `DirectoryElement.accept()`.
 4. Show `SizeCalculatorVisitor` and `SearchVisitor` implementations.
@@ -12,13 +12,13 @@
 
 ## 2. Files to open in IntelliJ
 
-- `src/main/java/com/aitu/sdp/assignment6/visitor/Element.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/Visitor.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/FileElement.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/DirectoryElement.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/SizeCalculatorVisitor.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/SearchVisitor.java`
-- `src/test/java/com/aitu/sdp/assignment6/visitor/FileSystemVisitorTest.java`
+- `src/main/java/com/aitu/sdp/visitor/Element.java`
+- `src/main/java/com/aitu/sdp/visitor/Visitor.java`
+- `src/main/java/com/aitu/sdp/visitor/FileElement.java`
+- `src/main/java/com/aitu/sdp/visitor/DirectoryElement.java`
+- `src/main/java/com/aitu/sdp/visitor/SizeCalculatorVisitor.java`
+- `src/main/java/com/aitu/sdp/visitor/SearchVisitor.java`
+- `src/test/java/com/aitu/sdp/visitor/FileSystemVisitorTest.java`
 
 ## 3. Methods to explain
 
@@ -124,4 +124,3 @@ The child list is protected by unmodifiable storage, which prevents uncontrolled
 ### Russian notes
 
 "В этом проекте используется паттерн Visitor для виртуальной файловой системы. `Element` — это абстракция с `accept()`, а `Visitor` объявляет `visitFile()` и `visitDirectory()`. `FileElement` вызывает `visitor.visitFile(this)`, а `DirectoryElement` вызывает `visitor.visitDirectory(this)`. Это double dispatch: объект выбирает реализацию `accept()`, а затем вызывается подходящий перегруженный метод `visit*()`. `SizeCalculatorVisitor` считает общий размер в байтах, а `SearchVisitor` рекурсивно ищет файлы по ��мени. Я также валидирую входные данные и защищаю внутренний список детей, чтобы сохранить инкапсуляцию. Реализация покрыта JUnit-тестами и доступна через `/api/visitor/demo`."
-

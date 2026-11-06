@@ -4,7 +4,7 @@
 
 The Visitor pattern is useful when one object structure needs to support multiple independent operations without mixing those operations into the element classes themselves. In this project, the existing design already contains a natural object structure: a root directory with nested directories and files. The pattern is especially appropriate here because the element types are stable, but the required operations are different: size calculation and search.
 
-The project uses the File System Visitor variant instead of forcing the pattern onto the existing PC configuration model. That keeps the implementation simple, realistic, and aligned with the assignment requirements. The object structure is formed by `Element`, `FileElement`, and `DirectoryElement`, while the operations are encapsulated in `SizeCalculatorVisitor` and `SearchVisitor`.
+The Visitor module keeps a standalone file-system demonstration while also integrating the same stable element structure into PC configuration. The `FileSystemDemoService` builds a virtual deployment/diagnostic bundle from the configured `Computer` and HTML report; `SizeCalculatorVisitor` calculates its total size and `SearchVisitor` locates matching artifact names. The existing `/api/visitor/demo` demonstration remains available.
 
 The key idea is that a client does not call `if/else` or `instanceof` to decide what to do. Instead, it calls `element.accept(visitor)`, and the runtime type of the element chooses the proper overloaded visitor method.
 
@@ -213,11 +213,12 @@ The project includes JUnit tests for the visitor module. They cover:
 - recursive size calculation
 - recursive search and case-sensitivity behavior
 - OCP-style extension via a new visitor
+- artifact bundle generation and visitor sizing/search over configured PC output
 
 The project test command used in this environment is:
 
 ```powershell
-.\mvnw.cmd test
+.\mvnw.cmd clean test
 ```
 
 The build command used here is:
@@ -233,6 +234,7 @@ GET /api/visitor/demo
 ```
 
 This returns a JSON summary with the root name, total size, and matched search results.
+The integrated PC build flow is available at `GET /api/visitor/pc-bundle?ecosystem=intel_nvidia&buildType=gaming&query=log`.
 
 ## 8. Conclusion
 
@@ -244,5 +246,4 @@ The design is clean, extensible, and easy to explain in defense: a tree of eleme
 
 Repository link:
 
-<https://github.com/muchanroma2501/SDPasik5>
-
+<https://github.com/muchanroma2501/SDPasik2>

@@ -146,6 +146,52 @@
             <iframe id="stress-report" title="Отчёт стресс-теста" sandbox="" hidden></iframe>
         </div>
     </section>
+
+    <section id="build-package-inspector" class="section-block">
+        <div class="section-title">
+            <div><p class="eyebrow">VISITOR PATTERN</p><h2>Build Package &amp; Diagnostic File Inspector (Visitor Pattern)</h2></div>
+            <p>Размер пакета и совпадающие файлы обходятся отдельными Visitor-объектами</p>
+        </div>
+        <div class="report-panel package-inspector">
+            <div class="package-controls">
+                <label class="field">Экосистема
+                    <select id="bundle-ecosystem">
+                        <option value="intel_nvidia">Intel + NVIDIA</option>
+                        <option value="amd">AMD</option>
+                    </select>
+                </label>
+                <label class="field">Конвейер сборки
+                    <select id="bundle-build-type">
+                        <option value="gaming">Gaming</option>
+                        <option value="workstation">Workstation</option>
+                        <option value="budget">Budget</option>
+                    </select>
+                </label>
+                <label class="field">Ключевое слово
+                    <input id="bundle-query" type="search" value="log" placeholder="log, bin, html, pkg">
+                </label>
+                <button id="inspect-package-button" class="button button-secondary" type="button">Inspect Build Package (Run Visitors)</button>
+            </div>
+            <p id="bundle-status" class="muted-line" role="status" aria-live="polite">Загрузка виртуального пакета сборки…</p>
+            <div id="bundle-output" class="bundle-output" hidden>
+                <div class="bundle-summary">
+                    <div class="bundle-hardware"><span class="bundle-label">CPU</span><strong id="bundle-cpu"></strong></div>
+                    <div class="bundle-hardware"><span class="bundle-label">GPU</span><strong id="bundle-gpu"></strong></div>
+                    <div class="bundle-size"><span class="bundle-label">Total package size</span><strong id="bundle-size"></strong></div>
+                </div>
+                <div class="bundle-details">
+                    <section class="bundle-detail">
+                        <h3>Matched files</h3>
+                        <ul id="bundle-matches" class="bundle-list"></ul>
+                    </section>
+                    <section class="bundle-detail">
+                        <h3>Virtual directory tree</h3>
+                        <ul id="bundle-structure" class="bundle-list bundle-tree"></ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
 <footer class="footer"><span>PC Build Studio</span><span>Сокет и питание проверяются сервером · расчёт мощности — учебная оценка</span></footer>
 </body>

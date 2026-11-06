@@ -1,18 +1,18 @@
-# Final Project Audit and Change Report — PC Build Studio
+# SDP_FINAL_PROJECT - SDP_FINAL_PROJECT - Final Project Audit and Change Report
 
 ## A. Executive Summary
 
-The repository is currently on the `main` branch tracking `sdpasik5/main` and contains two major recent workstreams:
+SDP_FINAL_PROJECT is the unified PC Build Studio defense project, organized under the `com.aitu.sdp` pattern-oriented packages.
 
 - a minimalist editorial-style website redesign in `src/main/resources/static/index.html` and `src/main/resources/static/css/app.css`
-- an Assignment #6 Visitor Pattern implementation under `src/main/java/com/aitu/sdp/assignment6/visitor` with matching tests and documentation
+- the Visitor Pattern implementation under `src/main/java/com/aitu/sdp/visitor` with its integrated PC build-bundle endpoint and tests
 
 The codebase is in a generally healthy state: the project builds successfully and the automated test suite passes. The main caveat is that the live runtime verification is partially blocked by a port conflict on `localhost:8080`, and there is no browser automation in this environment to visually inspect the redesign end-to-end.
 
 The final evidence shows:
 
-- `git status` includes tracked modifications to the redesign files and new/untracked Assignment #6 files
-- `mvnw test` completed successfully with 21 tests run, 0 failures, 0 errors, 0 skipped
+- the source layout uses `creational`, `bridge`, `facade`, `strategy`, and `visitor` packages under `com.aitu.sdp`
+- `mvnw clean test` completed successfully with 24 tests run, 0 failures, 0 errors, 0 skipped
 - `mvnw clean package` completed successfully and produced the JAR
 - the project is not fully browser-verified due environment constraints, but the static UI and backend tests are in place and passing
 
@@ -30,7 +30,7 @@ What changed:
 
 - The static UI was restyled from a darker dashboard aesthetic to a lighter editorial magazine look.
 - The top bar, hero banner, layout spacing, cards, buttons, diagnostics panels, and report sections all received significant CSS updates.
-- The project README repository URL was updated from `SDPasik2` to `SDPasik5`.
+- The project README repository URL was updated from `SDPasik2` to `SDPasik2`.
 - The HTML structure remained functionally similar but was refined to support the redesigned layout and branding.
 
 Why it was changed:
@@ -41,16 +41,16 @@ Why it was changed:
 
 Files added:
 
-- `src/main/java/com/aitu/sdp/assignment6/visitor/Element.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/Visitor.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/FileElement.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/DirectoryElement.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/SizeCalculatorVisitor.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/SearchVisitor.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/FileSystemDemoService.java`
-- `src/main/java/com/aitu/sdp/assignment6/visitor/FileSystemDemoController.java`
-- `src/test/java/com/aitu/sdp/assignment6/visitor/FileSystemVisitorTest.java`
-- `src/test/java/com/aitu/sdp/assignment6/visitor/FileSystemDemoControllerTest.java`
+- `src/main/java/com/aitu/sdp/visitor/Element.java`
+- `src/main/java/com/aitu/sdp/visitor/Visitor.java`
+- `src/main/java/com/aitu/sdp/visitor/FileElement.java`
+- `src/main/java/com/aitu/sdp/visitor/DirectoryElement.java`
+- `src/main/java/com/aitu/sdp/visitor/SizeCalculatorVisitor.java`
+- `src/main/java/com/aitu/sdp/visitor/SearchVisitor.java`
+- `src/main/java/com/aitu/sdp/visitor/FileSystemDemoService.java`
+- `src/main/java/com/aitu/sdp/visitor/FileSystemDemoController.java`
+- `src/test/java/com/aitu/sdp/visitor/FileSystemVisitorTest.java`
+- `src/test/java/com/aitu/sdp/visitor/FileSystemDemoControllerTest.java`
 
 Documentation added:
 
@@ -68,11 +68,11 @@ What changed:
 
 Existing test coverage remains active and passing:
 
-- `com.aitu.sdp.assignment4.controller.PCConfiguratorApiTest`
-- `com.aitu.sdp.assignment4.diagnostics.BuildDiagnosticsServiceTest`
-- `com.aitu.sdp.assignment5.strategy.BuildStrategyContextTest`
-- `com.aitu.sdp.assignment6.visitor.FileSystemDemoControllerTest`
-- `com.aitu.sdp.assignment6.visitor.FileSystemVisitorTest`
+- `com.aitu.sdp.facade.controller.PCConfiguratorApiTest`
+- `com.aitu.sdp.facade.diagnostics.BuildDiagnosticsServiceTest`
+- `com.aitu.sdp.strategy.BuildStrategyContextTest`
+- `com.aitu.sdp.visitor.FileSystemDemoControllerTest`
+- `com.aitu.sdp.visitor.FileSystemVisitorTest`
 
 ### 4) Unrelated or pre-existing work
 
@@ -193,36 +193,36 @@ The actual Visitor implementation demonstrates the following principles.
 
 ### Commands executed
 
-1. `. 5cmvnw.cmd test`
-2. `. 5cmvnw.cmd clean package`
+1. `.\mvnw.cmd clean test`
+2. `.\mvnw.cmd clean package`
 
 ### Actual results
 
-#### `. 5cmvnw.cmd test`
+#### `.\mvnw.cmd clean test`
 
 - Result: `BUILD SUCCESS`
-- Tests run: `21`
+- Tests run: `24`
 - Failures: `0`
 - Errors: `0`
 - Skipped: `0`
 - Relevant suites:
-  - `com.aitu.sdp.assignment4.controller.PCConfiguratorApiTest` — 3 tests
-  - `com.aitu.sdp.assignment4.diagnostics.BuildDiagnosticsServiceTest` — 8 tests
-  - `com.aitu.sdp.assignment5.strategy.BuildStrategyContextTest` — 2 tests
-  - `com.aitu.sdp.assignment6.visitor.FileSystemDemoControllerTest` — 1 test
-  - `com.aitu.sdp.assignment6.visitor.FileSystemVisitorTest` — 7 tests
+  - `com.aitu.sdp.facade.controller.PCConfiguratorApiTest` — 3 tests
+  - `com.aitu.sdp.facade.diagnostics.BuildDiagnosticsServiceTest` — 8 tests
+  - `com.aitu.sdp.strategy.BuildStrategyContextTest` — 2 tests
+  - `com.aitu.sdp.visitor.FileSystemDemoControllerTest` — 2 tests
+  - `com.aitu.sdp.visitor.FileSystemVisitorTest` — 9 tests
 
-#### `. 5cmvnw.cmd clean package`
+#### `.\mvnw.cmd clean package`
 
 - Result: `BUILD SUCCESS`
-- Artifact produced: `target/sdpasik2-1.0.0.jar`
-- Repackaged Spring Boot JAR also created as `target/sdpasik2-1.0.0.jar.original`
+- Artifact produced: `target/sdp-final-project-1.0.0.jar`
+- Repackaged Spring Boot JAR also created as `target/sdp-final-project-1.0.0.jar.original`
 
 ### Additional runtime-start attempts
 
 The environment also attempted to run the app in live mode:
 
-- `. 5cmvnw.cmd spring-boot:run` failed because port 8080 was already in use
+- `.\mvnw.cmd spring-boot:run` failed because port 8080 was already in use
 - the subsequent `spring-boot:run` attempt on port 8081 with the wrong CLI syntax failed due invalid Maven lifecycle usage
 
 The strongest available runtime evidence is that a GET request to `http://localhost:8080` returned HTTP 200 while an unrelated process was already occupying the default port, which means clean project startup verification is limited by port conflicts rather than source-level build failure.
@@ -253,7 +253,7 @@ The strongest available runtime evidence is that a GET request to `http://localh
 
 The following files exist and are relevant:
 
-- `README.md` — current repository URL updated to `https://github.com/muchanroma2501/SDPasik5`
+- `README.md` — current repository URL updated to `https://github.com/muchanroma2501/SDPasik2`
 - `docs/assignment6-report.md` — Assignment #6 report exists
 - `docs/assignment6-defense-notes.md` — defense notes exist
 - `docs/assignment6-uml.puml` — UML source exists
@@ -262,7 +262,7 @@ The following files exist and are relevant:
 
 ### Verification against implementation
 
-- `assignment6-report.md` references the actual classes and methods present in the `assignment6/visitor` package
+- `assignment6-report.md` references the actual classes and methods present in the `visitor` package
 - UML relationships in `assignment6-uml.puml` match the implemented classes and dependencies
 - Sample values and totals in the report are consistent with the tested expected results (`1160` bytes total; matches `app.log` and `system.log`)
 - README commands and repository URL are consistent with the actual project and wrapper script

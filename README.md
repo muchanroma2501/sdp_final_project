@@ -1,8 +1,8 @@
-# PC Build Studio
+# SDP_FINAL_PROJECT — PC Build Studio
 
-PC Build Studio is a Java 17 and Spring Boot web application for selecting PC hardware, validating compatibility on the server, assembling builds, and exporting reports. The browser interface is Russian-language, responsive, and uses plain HTML, CSS, and JavaScript. Hardware models and metadata come from the existing in-memory component catalog; no database or frontend build pipeline is required.
+SDP_FINAL_PROJECT is a Java 17 and Spring Boot defense project demonstrating seven Software Design Patterns through a PC Build Studio web application. It supports PC hardware selection, server-side compatibility validation, build assembly, diagnostics, report export, and virtual build-package inspection. The responsive Russian-language browser interface uses plain HTML, CSS, and JavaScript. Hardware metadata comes from an in-memory catalog; no database or frontend build pipeline is required.
 
-Repository: <https://github.com/muchanroma2501/SDPasik5>
+Repository: <https://github.com/muchanroma2501/SDPasik2>
 
 ## Requirements and commands
 
@@ -23,10 +23,10 @@ Open <http://localhost:8080>. Package and run the executable JAR with:
 
 ```powershell
 .\mvnw.cmd clean package
-java -jar target/sdpasik2-1.0.0.jar
+java -jar target/sdp-final-project-1.0.0.jar
 ```
 
-Run automated tests with `.\mvnw.cmd test` (Windows) or `./mvnw test` (Unix).
+Run the clean test suite with `.\mvnw.cmd clean test` (Windows) or `./mvnw clean test` (Unix).
 
 ## API
 
@@ -42,6 +42,7 @@ The supported platform values are exactly `intel_nvidia` and `amd`. Preset build
 | `GET` | `/api/reports/export?reportType=summary&format=html` | Backward-compatible Bridge export using the legacy default gaming configuration. |
 | `POST` | `/api/reports/export` | Exports the actual submitted selection with Bridge report and exporter choices. |
 | `POST` | `/api/diagnostics/run` | Runs the separate simulated CPU/GPU/thermal stress-test facade for the submitted configuration and returns HTML. |
+| `GET` | `/api/visitor/pc-bundle?ecosystem=intel_nvidia&buildType=gaming&query=log` | Builds a configured PC, runs diagnostics, and uses Visitors to size and search its virtual artifact bundle. |
 
 Example diagnostics/build request:
 
@@ -81,11 +82,19 @@ Example report request (the selection is nested under `configuration`):
 
 Malformed JSON and invalid selections return readable JSON errors. Invalid or unknown input is rejected with HTTP 400; a well-formed but incompatible build is rejected with HTTP 422. The diagnose endpoint is intentionally different: it returns HTTP 200 with a `BLOCKED` result so clients can display each failed check.
 
-## Assignment #4 — configuration Facade
+## Pattern-driven architecture
 
-`com.aitu.sdp.assignment4.facade.PCConfiguratorFacade` is the high-level API used by `PCConfiguratorController`. It coordinates the `ComponentFactoryProvider`, the real `ComponentCatalog`, `BuildDiagnosticsService`/`CompatibilityChecker`, the existing Factory Method order factories, and the existing Builder. It resolves platform and component models, obtains server diagnostics, blocks errors, permits warnings, and returns the existing `PCResponse` fields plus diagnostics and power values. The controller only binds HTTP routes and transport DTOs.
+The application entry point is `com.aitu.sdp.Main`, which component-scans `com.aitu.sdp`. Pattern implementations are grouped by domain and pattern rather than by assignment number:
 
-The facade does not replace its collaborators: the catalog, factories, builders, diagnostics, and order factories remain independently usable. None of those subsystem classes refers back to the facade. `PCReportFacade` is a distinct facade for Assignment 3 report composition. It validates and builds the submitted configuration through the configurator facade, then connects an existing Bridge report type to the requested exporter. The legacy GET report stays available.
+- **Abstract Factory:** `com.aitu.sdp.creational` defines `ComponentFactory` and platform-specific factories for compatible hardware families.
+- **Factory Method:** `com.aitu.sdp.creational` includes `ComputerOrderFactory` and gaming, budget, and workstation order factories.
+- **Builder:** `com.aitu.sdp.creational` contains computer builders that assemble the immutable `Computer`.
+- **Bridge:** `com.aitu.sdp.bridge` separates report detail from HTML/JSON exporters; the HTTP adapter is in `com.aitu.sdp.bridge.controller`.
+- **Facade:** `com.aitu.sdp.facade` coordinates PC configuration, reporting, and diagnostics; supporting diagnostics and HTTP adapters live in `com.aitu.sdp.facade.diagnostics` and `com.aitu.sdp.facade.controller`.
+- **Strategy:** `com.aitu.sdp.strategy` provides runtime selection among gaming, budget, and workstation pipelines.
+- **Visitor:** `com.aitu.sdp.visitor` provides the virtual artifact tree and size/search visitors used by `/api/visitor/pc-bundle`.
+
+The configurator facade coordinates the component provider, catalog, diagnostics, Factory Method order factories, Builder, and Strategy registry. The report facade remains a separate coordinator for report creation. The stress-test facade simulates CPU, GPU, and thermal interactions; its metrics are not hardware certification.
 
 ### Educational power rules
 
@@ -100,15 +109,7 @@ These are deterministic educational estimates, not guaranteed manufacturer recom
 
 The Builder and diagnostics use the shared `PowerRequirementCalculator`. The catalog contains no RAM-generation compatibility metadata, so the application does not claim to validate RAM generation, thermals, benchmarks, FPS, or performance in the compatibility diagnostic.
 
-## Existing pattern assignments
-
-- **Abstract Factory:** `ComponentFactory`, `IntelNvidiaComponentFactory`, and `AMDComponentFactory` create hardware from a compatible component family.
-- **Factory Method:** `ComputerOrderFactory` and the gaming, budget, and workstation order factories select a concrete Builder pipeline.
-- **Builder:** `ComputerBuilder` implementations construct the immutable `Computer` and retain construction-time required-field, socket, and minimum-power validation.
-- **Bridge:** `ComputerReport` refinements (`SummarySpecsReport`, `FullDiagnosticReport`) and `ReportExporter` implementations (`HtmlReportExporter`, `JsonReportExporter`) vary report content and output format independently.
-- **Facade:** `PCConfiguratorFacade` coordinates the normal PC configuration workflow. The pre-existing `SystemStressTestFacade` remains a separate assignment demonstration for simulated CPU, GPU, and thermal collaborators; its stress metrics are not compatibility or hardware certification.
-
-`BridgePatternDemo` remains runnable as a standalone Java demonstration and is not invoked during Spring Boot startup.
+`BridgePatternDemo` remains runnable as a standalone Java demonstration and is not invoked during Spring Boot startup. The Visitor endpoint composes configuration, Strategy, diagnostics, and artifact inspection without altering existing REST contracts.
 
 ## Frontend and browser storage
 
@@ -116,18 +117,22 @@ The static UI is organized as `src/main/resources/static/index.html`, `css/app.c
 
 ## Tests
 
-`.\mvnw.cmd test` runs:
+`.\mvnw.cmd clean test` (Windows) or `./mvnw clean test` (Unix) runs:
 
 - Unit tests for model resolution, sockets, minimum and recommended PSU thresholds, unknown models, invalid platform values, and facade build/rejection behavior.
 - Spring MockMvc tests for presets, both catalogs, diagnostics, custom and named builds, report export for the requested components, malformed JSON, and unsupported content types.
+- Visitor tests for artifact tree sizing/search and MockMvc coverage for the integrated PC bundle endpoint.
 
 ## Project structure
 
 ```text
 com.aitu.sdp
-├── assignment2          # Hardware model, catalog, factories, Builder, HTTP DTOs
-├── assignment3          # Bridge reports and report controller
-└── assignment4          # Configuration/report facades, diagnostics, stress-test facade
+├── Main.java            # Spring Boot entry point and component-scan root
+├── creational           # Hardware model, catalog, factories, Builder, HTTP DTOs
+├── bridge               # Bridge reports, exporters, and report controller
+├── facade               # Configuration/report facades, diagnostics, support, HTTP adapters
+├── strategy             # Runtime build pipeline strategies and context
+└── visitor              # Virtual artifact tree, Visitors, and visitor controller/service
 src/main/resources/static
 ├── css/app.css
 ├── js/app.js
@@ -135,18 +140,18 @@ src/main/resources/static
 docs                    # Audit, UML, assignment report draft, defense notes
 ```
 
-## Assignment #5 — Strategy Pattern
+## Strategy Pattern — Runtime Build Pipeline
 
-This assignment adds the Strategy behavioral pattern to the existing PC Build Studio application. The project already has three named build algorithms: gaming, budget, and workstation. Instead of a single conditional block selecting the correct factory, the build algorithm is now represented as a strategy object and executed through a small context.
+The application has three named build algorithms: gaming, budget, and workstation. The build algorithm is represented as a strategy object and executed through a small context.
 
 ### Strategy structure
 
-- `com.aitu.sdp.assignment5.strategy.ComputerBuildStrategy` — common strategy interface
-- `com.aitu.sdp.assignment5.strategy.GamingBuildStrategy` — gaming build algorithm
-- `com.aitu.sdp.assignment5.strategy.BudgetBuildStrategy` — budget build algorithm
-- `com.aitu.sdp.assignment5.strategy.WorkstationBuildStrategy` — workstation build algorithm
-- `com.aitu.sdp.assignment5.strategy.BuildStrategyContext` — holds the current strategy and delegates execution
-- `com.aitu.sdp.assignment4.facade.PCConfiguratorFacade` — client that selects the strategy and validates the request
+- `com.aitu.sdp.strategy.ComputerBuildStrategy` — common strategy interface
+- `com.aitu.sdp.strategy.GamingBuildStrategy` — gaming build algorithm
+- `com.aitu.sdp.strategy.BudgetBuildStrategy` — budget build algorithm
+- `com.aitu.sdp.strategy.WorkstationBuildStrategy` — workstation build algorithm
+- `com.aitu.sdp.strategy.BuildStrategyContext` — holds the current strategy and delegates execution
+- `com.aitu.sdp.facade.PCConfiguratorFacade` — client that selects the strategy and validates the request
 
 The Strategy pattern complements the existing Factory Method and Builder patterns instead of replacing them. The strategy chooses the correct order factory and Builder pipeline for the selected build type, while the Factory Method and Builder remain responsible for the actual assembly flow.
 
@@ -210,7 +215,7 @@ Workstation:
 ### Running the application
 
 ```powershell
-./mvnw.cmd spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 
 ```bash
@@ -222,21 +227,22 @@ Then open <http://localhost:8080>.
 ### Running the tests
 
 ```powershell
-./mvnw.cmd test
+.\mvnw.cmd clean test
 ```
 
 ```bash
-./mvnw test
+./mvnw clean test
 ```
 
 ### How the Strategy pattern fits the project
 
 The application still uses:
 
-- Abstract Factory: `ComponentFactory` and the platform-specific factories
-- Factory Method: named order factories such as `GamingPCOrderFactory`, `BudgetPCOrderFactory`, and `WorkstationPCOrderFactory`
-- Builder: `ComputerBuilder` implementations create the immutable `Computer`
-- Facade: `PCConfiguratorFacade` coordinates validation, diagnostics, and response assembly
-- Strategy: chooses the named build algorithm dynamically without changing the context logic
+- Abstract Factory and Builder in `com.aitu.sdp.creational` create a platform-compatible immutable computer.
+- Factory Method in `com.aitu.sdp.creational` selects the named order/build pipeline.
+- Strategy in `com.aitu.sdp.strategy` selects gaming, budget, or workstation behavior at runtime.
+- Facade in `com.aitu.sdp.facade` coordinates configuration, diagnostics, and report operations.
+- Bridge in `com.aitu.sdp.bridge` separates report representation from HTML/JSON export.
+- Visitor in `com.aitu.sdp.visitor` calculates and searches the artifact bundle returned by `/api/visitor/pc-bundle`.
 
 This makes the code more flexible, easier to extend, and better suited for defense explanations.

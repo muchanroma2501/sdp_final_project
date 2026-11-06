@@ -573,6 +573,51 @@
         }
     }
 
+    function renderBundleList(id, entries, className = "") {
+        const list = $("#" + id);
+        list.replaceChildren();
+        list.className = `bundle-list ${className}`.trim();
+        for (const entry of entries || []) {
+            const item = document.createElement("li");
+            item.textContent = entry;
+            list.append(item);
+        }
+        if (!entries?.length) {
+            const empty = document.createElement("li");
+            empty.className = "bundle-empty";
+            empty.textContent = "Совпадений нет.";
+            list.append(empty);
+        }
+    }
+
+    async function inspectBuildPackage() {
+        const button = $("#inspect-package-button");
+        const status = $("#bundle-status");
+        const output = $("#bundle-output");
+        button.disabled = true;
+        status.textContent = "Формируем сборку и выполняем обходы Visitor…";
+        output.hidden = true;
+        try {
+            const params = new URLSearchParams({
+                ecosystem: $("#bundle-ecosystem").value,
+                buildType: $("#bundle-build-type").value,
+                query: $("#bundle-query").value.trim() || "log"
+            });
+            const bundle = await requestJson(`/api/visitor/pc-bundle?${params}`);
+            $("#bundle-cpu").textContent = bundle.cpu || "—";
+            $("#bundle-gpu").textContent = bundle.gpu || "—";
+            $("#bundle-size").textContent = `${bundle.totalSizeBytes} bytes`;
+            renderBundleList("bundle-matches", bundle.matches);
+            renderBundleList("bundle-structure", bundle.structure, "bundle-tree");
+            output.hidden = false;
+            status.textContent = `Пакет «${bundle.rootName}» проверен. Поиск: «${bundle.searchQuery}».`;
+        } catch (error) {
+            status.textContent = `Не удалось проверить пакет: ${error.message}`;
+        } finally {
+            button.disabled = false;
+        }
+    }
+
     function bindEvents() {
         $("#custom-form").addEventListener("submit", submitBuild);
         $$('[name="ecosystem"]').forEach(input => input.addEventListener("change", async event => {
@@ -594,6 +639,7 @@
         $("#generate-report").addEventListener("click", generateReport);
         $("#download-report").addEventListener("click", downloadReport);
         $("#stress-test-button").addEventListener("click", runStressTest);
+        $("#inspect-package-button").addEventListener("click", inspectBuildPackage);
         $("#clear-history").addEventListener("click", () => {
             recentActions = [];
             persistHistory();
@@ -604,7 +650,7 @@
     async function initialize() {
         bindEvents();
         renderHistory();
-        await Promise.all([loadPresets(), loadCatalog("intel_nvidia")]);
+        await Promise.all([loadPresets(), loadCatalog("intel_nvidia"), inspectBuildPackage()]);
         addHistory("Конфигуратор готов к работе.");
     }
 

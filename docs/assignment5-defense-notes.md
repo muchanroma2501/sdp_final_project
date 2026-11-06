@@ -147,14 +147,13 @@ The Strategy layer works with the existing components instead of replacing them.
 
 Open these files in order:
 
-1. `src/main/java/com/aitu/sdp/assignment5/strategy/ComputerBuildStrategy.java`
-2. `src/main/java/com/aitu/sdp/assignment5/strategy/GamingBuildStrategy.java`
-3. `src/main/java/com/aitu/sdp/assignment5/strategy/BudgetBuildStrategy.java`
-4. `src/main/java/com/aitu/sdp/assignment5/strategy/WorkstationBuildStrategy.java`
-5. `src/main/java/com/aitu/sdp/assignment5/strategy/BuildStrategyContext.java`
-6. `src/main/java/com/aitu/sdp/assignment4/facade/PCConfiguratorFacade.java`
-7. `src/main/java/com/aitu/sdp/assignment2/ComputerOrderFactory.java`
-8. `src/main/java/com/aitu/sdp/assignment2/GamingPCOrderFactory.java`
+1. `src/main/java/com/aitu/sdp/strategy/ComputerBuildStrategy.java`
+2. `src/main/java/com/aitu/sdp/strategy/GamingBuildStrategy.java`
+3. `src/main/java/com/aitu/sdp/strategy/BudgetBuildStrategy.java`
+4. `src/main/java/com/aitu/sdp/strategy/WorkstationBuildStrategy.java`
+5. `src/main/java/com/aitu/sdp/strategy/BuildStrategyContext.java`
+6. `src/main/java/com/aitu/sdp/facade/PCConfiguratorFacade.java`
+7. `src/main/java/com/aitu/sdp/creational/ComputerOrderFactory.java`
+8. `src/main/java/com/aitu/sdp/creational/GamingPCOrderFactory.java`
 
 This is enough to explain the whole design during the in-class defense.
-

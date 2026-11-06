@@ -690,6 +690,47 @@ main { width: min(1220px, calc(100% - 56px)); margin: 0 auto; }
     border: 1px solid var(--line);
     border-radius: 10px;
 }
+.package-inspector { display: grid; gap: 16px; }
+.package-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(210px, auto);
+    align-items: end;
+    gap: 12px;
+}
+.package-controls .button { min-height: 44px; }
+.bundle-output { padding-top: 16px; border-top: 1px solid var(--line); }
+.bundle-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+.bundle-hardware, .bundle-size {
+    display: grid;
+    gap: .25rem;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: rgba(255,255,255,0.65);
+}
+.bundle-label { color: var(--muted); font-size: .66rem; text-transform: uppercase; letter-spacing: .08em; }
+.bundle-hardware strong, .bundle-size strong { overflow-wrap: anywhere; font-size: .78rem; }
+.bundle-size strong { color: var(--success); }
+.bundle-details { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 14px; margin-top: 14px; }
+.bundle-detail { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.bundle-detail h3 { margin-bottom: 10px; font-size: .9rem; }
+.bundle-list { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.bundle-list li {
+    overflow-wrap: anywhere;
+    padding: .48rem .6rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel-alt);
+    color: var(--text);
+    font: .7rem/1.45 "Consolas", "Courier New", monospace;
+}
+.bundle-tree li { border-left: 3px solid var(--line-strong); }
+.bundle-list .bundle-empty { color: var(--muted); font-family: inherit; }
 .footer {
     display: flex;
     justify-content: space-between;
@@ -765,6 +806,9 @@ main { width: min(1220px, calc(100% - 56px)); margin: 0 auto; }
     .side-column { position: static; grid-template-columns: 1fr 1fr; }
     .report-options { grid-template-columns: 1fr 1fr; }
     .report-options .button { grid-column: 1 / -1; }
+    .package-controls { grid-template-columns: 1fr 1fr; }
+    .package-controls .button { grid-column: 1 / -1; }
+    .bundle-details { grid-template-columns: 1fr; }
     .footer { flex-direction: column; gap: .3rem; }
 }
 @media (max-width: 480px) {
@@ -785,6 +829,8 @@ main { width: min(1220px, calc(100% - 56px)); margin: 0 auto; }
     .side-column { grid-template-columns: 1fr; }
     .report-options { grid-template-columns: 1fr; }
     .report-options .button { grid-column: auto; width: 100%; }
+    .package-controls, .bundle-summary { grid-template-columns: 1fr; }
+    .package-controls .button { grid-column: auto; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }

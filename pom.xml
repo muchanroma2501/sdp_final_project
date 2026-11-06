@@ -5,16 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aitu.sdp</groupId>
-    <artifactId>sdpasik2</artifactId>
+    <artifactId>sdp-final-project</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
+    <name>SDP_FINAL_PROJECT</name>
+    <description>PC Build Studio - Software Design Patterns Final Project Defense</description>
 
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>com.aitu.sdp.assignment2.Main</mainClass>
+        <mainClass>com.aitu.sdp.Main</mainClass>
         <spring-boot.version>3.3.5</spring-boot.version>
     </properties>
 
